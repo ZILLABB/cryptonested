@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="170px" height="170px" viewBox="0 0 170 170" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g transform="translate(0.000000, 0.000000)" fill="#F3BA2F" fill-rule="nonzero">
+            <circle cx="85" cy="85" r="85"></circle>
+            <path d="M85,45.9 L99.7,60.6 L70.3,90 L55.6,75.3 L85,45.9 Z M85,16.5 L114.4,45.9 L129.1,31.2 L85,16.5 Z M85,153.5 L55.6,124.1 L40.9,138.8 L85,153.5 Z M85,124.1 L99.7,109.4 L85,94.7 L70.3,109.4 L85,124.1 Z M40.9,31.2 L55.6,45.9 L85,16.5 L40.9,31.2 Z M129.1,138.8 L114.4,124.1 L85,153.5 L129.1,138.8 Z M114.4,75.3 L99.7,90 L129.1,60.6 L114.4,75.3 Z M40.9,60.6 L70.3,90 L55.6,104.7 L40.9,90 L40.9,60.6 Z M114.4,104.7 L99.7,90 L129.1,90 L129.1,119.4 L114.4,104.7 Z"></path>
+        </g>
+    </g>
+</svg>

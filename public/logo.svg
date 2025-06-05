@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200px" height="200px" viewBox="0 0 200 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="cryptoNestedGradient">
+            <stop stop-color="#4F46E5" offset="0%"></stop>
+            <stop stop-color="#8B5CF6" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g transform="translate(25.000000, 25.000000)">
+            <!-- Outer Circle -->
+            <circle fill="url(#cryptoNestedGradient)" cx="75" cy="75" r="75"></circle>
+            
+            <!-- Inner Elements -->
+            <path d="M75,30 C49.1,30 28,51.1 28,77 C28,102.9 49.1,124 75,124 C100.9,124 122,102.9 122,77 C122,51.1 100.9,30 75,30 Z M75,114 C54.6,114 38,97.4 38,77 C38,56.6 54.6,40 75,40 C95.4,40 112,56.6 112,77 C112,97.4 95.4,114 75,114 Z" fill="white" fill-rule="nonzero"></path>
+            
+            <!-- Crypto Symbol -->
+            <path d="M92,65 L92,89 C92,91.2 90.2,93 88,93 L62,93 C59.8,93 58,91.2 58,89 L58,65 C58,62.8 59.8,61 62,61 L88,61 C90.2,61 92,62.8 92,65 Z M84,73 L66,73 L66,81 L84,81 L84,73 Z" fill="white" fill-rule="nonzero"></path>
+            
+            <!-- Dots -->
+            <circle fill="white" cx="35" cy="50" r="6"></circle>
+            <circle fill="white" cx="115" cy="50" r="6"></circle>
+            <circle fill="white" cx="35" cy="100" r="6"></circle>
+            <circle fill="white" cx="115" cy="100" r="6"></circle>
+        </g>
+    </g>
+</svg>

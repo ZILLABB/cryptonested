@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600px" height="400px" viewBox="0 0 600 400" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="teamGradient1">
+            <stop stop-color="#4F46E5" offset="0%"></stop>
+            <stop stop-color="#8B5CF6" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="teamGradient2">
+            <stop stop-color="#10B981" offset="0%"></stop>
+            <stop stop-color="#3B82F6" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <!-- Background -->
+        <rect fill="#F3F4F6" x="0" y="0" width="600" height="400"></rect>
+        
+        <!-- Office Background Elements -->
+        <rect fill="#FFFFFF" x="0" y="0" width="600" height="300"></rect>
+        <rect fill="#E5E7EB" x="0" y="300" width="600" height="100"></rect>
+        
+        <!-- Windows -->
+        <rect fill="#DBEAFE" x="50" y="50" width="100" height="150" rx="4"></rect>
+        <rect fill="#DBEAFE" x="200" y="50" width="100" height="150" rx="4"></rect>
+        <rect fill="#DBEAFE" x="350" y="50" width="100" height="150" rx="4"></rect>
+        
+        <!-- Window Frames -->
+        <rect fill="#9CA3AF" x="50" y="50" width="100" height="10" rx="4"></rect>
+        <rect fill="#9CA3AF" x="200" y="50" width="100" height="10" rx="4"></rect>
+        <rect fill="#9CA3AF" x="350" y="50" width="100" height="10" rx="4"></rect>
+        
+        <rect fill="#9CA3AF" x="95" y="50" width="10" height="150" rx="4"></rect>
+        <rect fill="#9CA3AF" x="245" y="50" width="10" height="150" rx="4"></rect>
+        <rect fill="#9CA3AF" x="395" y="50" width="10" height="150" rx="4"></rect>
+        
+        <!-- Office Furniture -->
+        <rect fill="#D1D5DB" x="50" y="250" width="500" height="10" rx="2"></rect>
+        <rect fill="#9CA3AF" x="100" y="260" width="400" height="40" rx="4"></rect>
+        
+        <!-- Team Members -->
+        <!-- Person 1 -->
+        <g transform="translate(100, 280)">
+            <circle fill="#F3F4F6" cx="25" cy="0" r="25"></circle>
+            <circle fill="#4F46E5" cx="25" cy="-10" r="12"></circle>
+            <rect fill="#4F46E5" x="13" y="-10" width="24" height="24" rx="12"></rect>
+        </g>
+        
+        <!-- Person 2 -->
+        <g transform="translate(175, 280)">
+            <circle fill="#F3F4F6" cx="25" cy="0" r="25"></circle>
+            <circle fill="#10B981" cx="25" cy="-10" r="12"></circle>
+            <rect fill="#10B981" x="13" y="-10" width="24" height="24" rx="12"></rect>
+        </g>
+        
+        <!-- Person 3 -->
+        <g transform="translate(250, 280)">
+            <circle fill="#F3F4F6" cx="25" cy="0" r="25"></circle>
+            <circle fill="#F59E0B" cx="25" cy="-10" r="12"></circle>
+            <rect fill="#F59E0B" x="13" y="-10" width="24" height="24" rx="12"></rect>
+        </g>
+        
+        <!-- Person 4 -->
+        <g transform="translate(325, 280)">
+            <circle fill="#F3F4F6" cx="25" cy="0" r="25"></circle>
+            <circle fill="#EF4444" cx="25" cy="-10" r="12"></circle>
+            <rect fill="#EF4444" x="13" y="-10" width="24" height="24" rx="12"></rect>
+        </g>
+        
+        <!-- Person 5 -->
+        <g transform="translate(400, 280)">
+            <circle fill="#F3F4F6" cx="25" cy="0" r="25"></circle>
+            <circle fill="#8B5CF6" cx="25" cy="-10" r="12"></circle>
+            <rect fill="#8B5CF6" x="13" y="-10" width="24" height="24" rx="12"></rect>
+        </g>
+        
+        <!-- Office Plants -->
+        <g transform="translate(500, 250)">
+            <rect fill="#9CA3AF" x="0" y="0" width="40" height="30" rx="4"></rect>
+            <path d="M10,0 C10,-10 20,-15 30,-5 C40,-15 50,-10 50,0" fill="#10B981"></path>
+            <path d="M15,-5 C15,-15 25,-20 35,-10 C45,-20 55,-15 55,-5" fill="#10B981"></path>
+        </g>
+        
+        <g transform="translate(50, 250)">
+            <rect fill="#9CA3AF" x="0" y="0" width="30" height="20" rx="4"></rect>
+            <path d="M5,0 C5,-8 15,-12 25,-4 C35,-12 45,-8 45,0" fill="#10B981"></path>
+        </g>
+        
+        <!-- Decorative Elements -->
+        <circle fill="url(#teamGradient1)" opacity="0.1" cx="500" cy="100" r="50"></circle>
+        <circle fill="url(#teamGradient2)" opacity="0.1" cx="100" cy="350" r="30"></circle>
+        
+        <!-- Company Logo -->
+        <g transform="translate(475, 75)">
+            <circle fill="#4F46E5" cx="25" cy="25" r="25"></circle>
+            <path d="M25,10 C16.7,10 10,16.7 10,25 C10,33.3 16.7,40 25,40 C33.3,40 40,33.3 40,25 C40,16.7 33.3,10 25,10 Z M25,35 C19.5,35 15,30.5 15,25 C15,19.5 19.5,15 25,15 C30.5,15 35,19.5 35,25 C35,30.5 30.5,35 25,35 Z" fill="white" fill-rule="nonzero"></path>
+            <path d="M30,20 L30,30 C30,30.6 29.6,31 29,31 L21,31 C20.4,31 20,30.6 20,30 L20,20 C20,19.4 20.4,19 21,19 L29,19 C29.6,19 30,19.4 30,20 Z M28,23 L22,23 L22,27 L28,27 L28,23 Z" fill="white" fill-rule="nonzero"></path>
+        </g>
+    </g>
+</svg>
