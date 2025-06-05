@@ -6,6 +6,7 @@ interface WebSocketState {
     error: string | null;
     subscribe: (symbols: string[]) => void;
     unsubscribe: (symbols: string[]) => void;
+    connect: () => void;
 }
 
 const WEBSOCKET_URL = 'wss://stream.binance.com:9443/ws';
@@ -18,9 +19,16 @@ export const useWebSocket = create<WebSocketState>((set, get) => {
     const RECONNECT_DELAY = 5000;
 
     const connect = () => {
+        if (typeof window === 'undefined') return; // Don't connect on server
         if (ws?.readyState === WebSocket.OPEN) return;
 
-        ws = new WebSocket(WEBSOCKET_URL);
+        try {
+            ws = new WebSocket(WEBSOCKET_URL);
+        } catch (error) {
+            console.error('Failed to create WebSocket connection:', error);
+            set({ error: 'Failed to create connection' });
+            return;
+        }
 
         ws.onopen = () => {
             console.log('WebSocket connected');
@@ -93,14 +101,14 @@ export const useWebSocket = create<WebSocketState>((set, get) => {
         symbols.forEach(symbol => subscribedSymbols.delete(symbol));
     };
 
-    // Initial connection
-    connect();
+    // Don't auto-connect, let components decide when to connect
 
     return {
         isConnected: false,
         lastMessage: null,
         error: null,
         subscribe,
-        unsubscribe
+        unsubscribe,
+        connect
     };
 }); 

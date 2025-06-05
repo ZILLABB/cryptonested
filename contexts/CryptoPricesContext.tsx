@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useWebSocket } from '../lib/services/websocket.js';
+import { useWebSocket } from '../lib/websocket';
 
 type CryptoPrices = {
   bitcoin?: string;
@@ -31,20 +31,27 @@ export function CryptoPricesProvider({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Handle WebSocket messages
-  const handleMessage = (data: any) => {
-    setIsLoading(false);
-    setError(null);
-    
-    // Update prices with new data
-    setPrices(prevPrices => ({
-      ...prevPrices,
-      ...data
-    }));
-  };
-
   // Set up WebSocket connection
-  const { isConnected } = useWebSocket(handleMessage);
+  const { isConnected, lastMessage, error: wsError, subscribe, connect } = useWebSocket();
+
+  // Initialize connection on mount
+  useEffect(() => {
+    connect();
+  }, [connect]);
+
+  // Handle WebSocket messages
+  useEffect(() => {
+    if (lastMessage) {
+      setIsLoading(false);
+      setError(null);
+
+      // Update prices with new data
+      setPrices(prevPrices => ({
+        ...prevPrices,
+        [lastMessage.s]: lastMessage.c // symbol: current price
+      }));
+    }
+  }, [lastMessage]);
 
   // Handle connection status changes
   useEffect(() => {
@@ -53,8 +60,18 @@ export function CryptoPricesProvider({
       setError('Disconnected from price updates. Reconnecting...');
     } else {
       setError(null);
+      // Subscribe to popular crypto symbols when connected
+      subscribe(['BTCUSDT', 'ETHUSDT', 'ADAUSDT', 'SOLUSDT', 'XRPUSDT']);
     }
-  }, [isConnected]);
+  }, [isConnected, subscribe]);
+
+  // Handle WebSocket errors
+  useEffect(() => {
+    if (wsError) {
+      setError(wsError);
+      setIsLoading(false);
+    }
+  }, [wsError]);
 
   return (
     <CryptoPricesContext.Provider value={{ prices, isLoading, error }}>

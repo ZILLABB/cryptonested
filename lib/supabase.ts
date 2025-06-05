@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Use a default empty client if environment variables are not available
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ewivnbozikdxexaowiid.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3aXZuYm96aWtkeGV4YW93aWlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYzMDQzMjksImV4cCI6MjA2MTg4MDMyOX0.u6F4nZNRh1hJZBN6Di3DSA1RJdeDOSjzOeGzQyQcz58';
 
 // Only throw errors in development or if explicitly required
 if (process.env.NODE_ENV === 'development' && (!supabaseUrl || !supabaseAnonKey)) {
