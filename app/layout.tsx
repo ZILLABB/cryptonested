@@ -1,14 +1,13 @@
 
 import { ThemeProvider } from "next-themes";
-import Providers from "./providers.js";
-import { fontVariables } from "./lib/fonts.js";
+import Providers from "./providers";
 import "./globals.css";
-import AuthLayout from "./components/AuthLayout.js";
-import { PriceProvider } from "../contexts/PriceContext.js";
+import AuthLayout from "./components/AuthLayout";
+import { PriceProvider } from "../contexts/PriceContext";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={fontVariables}>
+    <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen font-sans" suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Providers>

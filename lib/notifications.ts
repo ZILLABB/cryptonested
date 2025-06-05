@@ -1,4 +1,4 @@
-import { toast } from "../app/components/ui/use-toast.js"
+import { toast } from "../app/components/ui/use-toast"
 
 type NotificationType = 'success' | 'error' | 'info' | 'warning'
 

@@ -2,12 +2,12 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation.js';
-import { Input } from '../../components/ui/Input.js';
-import { Button } from '../../components/ui/Button.js';
+import { useRouter } from 'next/navigation';
+import { Input } from '../../components/ui/Input';
+import { Button } from '../../components/ui/Button';
 import { ArrowLeft, AtSign, CheckCircle } from 'lucide-react';
-import { supabase } from '../../../lib/supabase.js';
-import { authNotifications } from '../../../lib/notifications.js';
+import { supabase } from '../../../lib/supabase';
+import { authNotifications } from '../../../lib/notifications';
 
 export default function ForgotPasswordPage() {
   const router = useRouter();

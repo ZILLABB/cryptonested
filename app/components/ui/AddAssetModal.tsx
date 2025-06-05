@@ -2,30 +2,28 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Search, Plus, ArrowRight } from 'lucide-react';
+import { X, Search, Plus, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from './Button';
 import Image from 'next/image';
 import { getTopCryptos, SimpleCryptoCoin } from '../../services/cryptoService';
+import { addHolding, addTransaction } from '../../services/portfolioService';
+import { useAuth } from '../../../contexts/AuthContext';
 
 interface AddAssetModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddAsset: (asset: {
-    id: string;
-    name: string;
-    symbol: string;
-    quantity: number;
-    price: number;
-    date: string;
-  }) => void;
+  portfolioId?: string;
+  onAssetAdded?: () => void;
 }
 
-export function AddAssetModal({ isOpen, onClose, onAddAsset }: AddAssetModalProps) {
+export function AddAssetModal({ isOpen, onClose, portfolioId, onAssetAdded }: AddAssetModalProps) {
+  const { user } = useAuth();
   const [step, setStep] = useState<'select' | 'details'>('select');
   const [searchTerm, setSearchTerm] = useState('');
   const [cryptoList, setCryptoList] = useState<SimpleCryptoCoin[]>([]);
   const [filteredCryptoList, setFilteredCryptoList] = useState<SimpleCryptoCoin[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedCrypto, setSelectedCrypto] = useState<SimpleCryptoCoin | null>(null);
   const [quantity, setQuantity] = useState('');
   const [price, setPrice] = useState('');
@@ -87,19 +85,61 @@ export function AddAssetModal({ isOpen, onClose, onAddAsset }: AddAssetModalProp
   };
   
   // Handle form submission
-  const handleSubmit = () => {
-    if (!selectedCrypto || !quantity || !price || !date) return;
-    
-    onAddAsset({
-      id: selectedCrypto.id,
-      name: selectedCrypto.name,
-      symbol: selectedCrypto.symbol,
-      quantity: parseFloat(quantity),
-      price: parseFloat(price),
-      date
-    });
-    
-    onClose();
+  const handleSubmit = async () => {
+    if (!selectedCrypto || !quantity || !price || !date || !user || !portfolioId) return;
+
+    try {
+      setIsSubmitting(true);
+
+      const quantityNum = parseFloat(quantity);
+      const priceNum = parseFloat(price);
+
+      if (isNaN(quantityNum) || isNaN(priceNum) || quantityNum <= 0 || priceNum <= 0) {
+        alert('Please enter valid quantity and price values');
+        return;
+      }
+
+      // Add holding to portfolio
+      const holdingResult = await addHolding(
+        portfolioId,
+        selectedCrypto.id,
+        quantityNum,
+        priceNum,
+        date
+      );
+
+      if (!holdingResult.success) {
+        throw new Error(holdingResult.error?.message || 'Failed to add holding');
+      }
+
+      // Add transaction record
+      await addTransaction(
+        user.id,
+        'buy',
+        selectedCrypto.id,
+        quantityNum,
+        priceNum,
+        0, // No fee for manual entry
+        `Manual entry - ${selectedCrypto.name}`,
+        date
+      );
+
+      // Reset form and close modal
+      setStep('select');
+      setSearchTerm('');
+      setSelectedCrypto(null);
+      setQuantity('');
+      setPrice('');
+      setDate(new Date().toISOString().split('T')[0]);
+
+      onClose();
+      onAssetAdded?.();
+    } catch (error: any) {
+      console.error('Error adding asset:', error);
+      alert(error.message || 'Failed to add asset. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   // Format currency
@@ -296,10 +336,19 @@ export function AddAssetModal({ isOpen, onClose, onAddAsset }: AddAssetModalProp
                         <Button
                           className="flex-1 bg-[var(--primary-500)] hover:bg-[var(--primary-600)] text-white"
                           onClick={handleSubmit}
-                          disabled={!quantity || !price || !date}
+                          disabled={!quantity || !price || !date || isSubmitting}
                         >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add to Portfolio
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Adding...
+                            </>
+                          ) : (
+                            <>
+                              <Plus className="h-4 w-4 mr-2" />
+                              Add to Portfolio
+                            </>
+                          )}
                         </Button>
                       </div>
                     </div>

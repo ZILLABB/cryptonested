@@ -1,12 +1,12 @@
 "use client";
 
-import { useRouter, useSearchParams } from 'next/navigation.js';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, ChangeEvent, FormEvent } from 'react';
-import { Input } from '../../components/ui/Input.js';
-import { Button } from '../../components/ui/Button.js';
+import { Input } from '../../components/ui/Input';
+import { Button } from '../../components/ui/Button';
 import { ArrowLeft, Lock, CheckCircle } from 'lucide-react';
-import { supabase } from '../../../lib/supabase.js';
-import { authNotifications } from '../../../lib/notifications.js';
+import { supabase } from '../../../lib/supabase';
+import { authNotifications } from '../../../lib/notifications';
 
 
 export default function UpdatePasswordPage() {
@@ -39,7 +39,6 @@ export default function UpdatePasswordPage() {
     }
 
     setLoading(true);
-    setError(null);
 
     try {
       const { error } = await supabase.auth.updateUser({

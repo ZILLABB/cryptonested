@@ -1,10 +1,10 @@
 "use client";
 
 import { ThemeProvider } from "next-themes";
-import { AuthProvider } from "../contexts/AuthContext.js";
-import { InactivityProvider } from "../contexts/InactivityContext.js";
-import { CryptoPricesProvider } from "../contexts/CryptoPricesContext.js";
-import { Toaster } from "./components/ui/toaster.js";
+import { AuthProvider } from "../contexts/AuthContext";
+import { InactivityProvider } from "../contexts/InactivityContext";
+import { CryptoPricesProvider } from "../contexts/CryptoPricesContext";
+import { Toaster } from "./components/ui/toaster";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (

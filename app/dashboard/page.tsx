@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState, lazy, Suspense, useCallback } from 'react';
-import DashboardWrapper from '../components/DashboardWrapper.jsx';
-import { Link, Image } from '../../lib/next-components.js';
+import DashboardWrapper from '../components/DashboardWrapper';
+import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import {
   ArrowUpRight, TrendingUp, Wallet, LineChart, Info,
@@ -11,11 +12,11 @@ import {
 } from 'lucide-react';
 
 // Lazy load components for better performance
-const MarketOverview = lazy(() => import("../components/ui/MarketOverview.jsx").then(mod => ({ default: mod.MarketOverview })));
-const TrendingCoins = lazy(() => import("../components/ui/TrendingCoins.jsx").then(mod => ({ default: mod.TrendingCoins })));
-const RecentTransactions = lazy(() => import("../components/ui/RecentTransactions.jsx").then(mod => ({ default: mod.RecentTransactions })));
-const MarketTrends = lazy(() => import("../components/ui/MarketTrends.jsx").then(mod => ({ default: mod.MarketTrends })));
-const CryptoNews = lazy(() => import("../components/ui/CryptoNews.jsx").then(mod => ({ default: mod.CryptoNews })));
+const MarketOverview = lazy(() => import("../components/ui/MarketOverview").then(mod => ({ default: mod.MarketOverview })));
+const TrendingCoins = lazy(() => import("../components/ui/TrendingCoins").then(mod => ({ default: mod.TrendingCoins })));
+const RecentTransactions = lazy(() => import("../components/ui/RecentTransactions").then(mod => ({ default: mod.RecentTransactions })));
+const MarketTrends = lazy(() => import("../components/ui/MarketTrends").then(mod => ({ default: mod.MarketTrends })));
+const CryptoNews = lazy(() => import("../components/ui/CryptoNews").then(mod => ({ default: mod.CryptoNews })));
 // LivePricesTicker component will be added later
 const LivePricesTicker = () => (
   <div className="bg-gray-100 dark:bg-gray-800 p-2 text-center">
@@ -23,18 +24,18 @@ const LivePricesTicker = () => (
   </div>
 );
 
-import { Button } from '../components/ui/Button.jsx';
-import { Card, CardHeader, CardContent } from '../components/ui/Card.jsx';
+import { Button } from '../components/ui/Button';
+import { Card, CardHeader, CardContent } from '../components/ui/Card';
 import { SkeletonMarketOverview,
   SkeletonTrendingCoins,
   SkeletonPortfolioSummary,
   SkeletonMarketTrends,
   SkeletonNews,
   SkeletonTransactions
-} from '../components/ui/Skeleton.jsx';
-import { getDashboardData, formatCurrency, formatPercentage } from "../services/dashboardService.js";
-import type { DashboardData } from "../services/dashboardService.js";
-import { useAuth } from '../../contexts/AuthContext.jsx';
+} from '../components/ui/Skeleton';
+import { getDashboardData, formatCurrency, formatPercentage } from "../services/dashboardService";
+import type { DashboardData } from "../services/dashboardService";
+import { useAuth } from '../../contexts/AuthContext';
 
 // Define animation variants
 const containerVariants = {

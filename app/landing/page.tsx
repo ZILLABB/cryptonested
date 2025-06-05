@@ -158,7 +158,7 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <Button
-                  href="/auth/signup"
+                  href="/staking"
                   variant={index === 1 ? "primary" : "outline"}
                   className="w-full dark:text-white"
                 >
@@ -356,7 +356,7 @@ export default function LandingPage() {
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Ready to start earning?</h3>
                 <p className="text-lg text-gray-600 dark:text-gray-300">Create your account in minutes and begin your crypto staking journey.</p>
               </div>
-              <Button href="/auth/signup" size="lg" className="whitespace-nowrap bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white px-8">
+              <Button href="/staking" size="lg" className="whitespace-nowrap bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white px-8">
                 Start Staking Now
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>

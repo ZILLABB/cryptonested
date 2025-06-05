@@ -6,11 +6,16 @@ import Image from 'next/image';
 import DashboardWrapper from '../components/DashboardWrapper';
 import { Card, CardHeader, CardContent } from '../components/ui/Card';
 import { AddAssetModal } from '../components/ui/AddAssetModal';
+import { EditHoldingModal } from '../components/ui/EditHoldingModal';
+import { ImportCSVModal } from '../components/ui/ImportCSVModal';
+import { PortfolioSelector } from '../components/ui/PortfolioSelector';
+import { PortfolioAnalytics } from '../components/ui/PortfolioAnalytics';
+import { AssetChart } from '../components/ui/AssetChart';
 import { Button } from '../components/ui/Button';
 import {
   ArrowUpDown, Plus, Filter, Download, Wallet, PieChart, Clock,
   TrendingUp, TrendingDown, DollarSign, Percent, BarChart3, Loader2,
-  Search
+  Search, Edit3, Upload
 } from 'lucide-react';
 import {
   Skeleton,
@@ -28,9 +33,11 @@ const PortfolioAllocation = lazy(() => import('../components/ui/PortfolioAllocat
 const PortfolioPerformanceChart = lazy(() => import('../components/ui/PortfolioPerformanceChart').then(mod => ({ default: mod.PortfolioPerformanceChart })));
 import {
   getPortfolioSummary, getAssetAllocation, getPortfolioHoldings,
-  getTransactionHistory, getPortfolioPerformance,
+  getTransactionHistory, getPortfolioPerformance, getPortfolios, createPortfolio,
   PortfolioSummary, AssetAllocation, PortfolioHolding, Transaction, PortfolioPerformance
 } from '../services/portfolioService';
+import { usePriceUpdates } from '../services/priceUpdateService';
+import { useAuth } from '../../contexts/AuthContext';
 
 // Define animation variants
 const containerVariants = {
@@ -57,10 +64,17 @@ const itemVariants = {
 };
 
 export default function PortfolioPage() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'holdings' | 'transactions'>('holdings');
   const [showAddAssetModal, setShowAddAssetModal] = useState(false);
+  const [showEditHoldingModal, setShowEditHoldingModal] = useState(false);
+  const [showImportCSVModal, setShowImportCSVModal] = useState(false);
+  const [showAssetChart, setShowAssetChart] = useState(false);
+  const [editingHolding, setEditingHolding] = useState<PortfolioHolding | null>(null);
+  const [selectedAsset, setSelectedAsset] = useState<PortfolioHolding | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPortfolioId, setCurrentPortfolioId] = useState<string | null>(null);
 
   // Portfolio data state
   const [portfolioSummary, setPortfolioSummary] = useState<PortfolioSummary | null>(null);
@@ -69,20 +83,74 @@ export default function PortfolioPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [performance, setPerformance] = useState<PortfolioPerformance | null>(null);
 
+  // Real-time price updates
+  const holdingSymbols = holdings.map(h => h.symbol);
+  const { prices, connectionStatus } = usePriceUpdates(holdingSymbols, holdings.length > 0);
+
+  // Update holdings with real-time prices
+  const updatedHoldings = holdings.map(holding => {
+    const priceUpdate = prices[holding.symbol];
+    if (priceUpdate) {
+      const newPrice = priceUpdate.price;
+      const newValue = holding.quantity * newPrice;
+      const profit = newValue - holding.totalCost;
+      const profitPercentage = holding.totalCost > 0 ? (profit / holding.totalCost) * 100 : 0;
+
+      return {
+        ...holding,
+        price: newPrice,
+        value: newValue,
+        profit,
+        profitPercentage,
+        change24h: priceUpdate.change24h
+      };
+    }
+    return holding;
+  });
+
   // Fetch portfolio data
   useEffect(() => {
     const fetchPortfolioData = async () => {
       try {
         setIsLoading(true);
 
+        if (!user) {
+          setError('Please sign in to view your portfolio');
+          setIsLoading(false);
+          return;
+        }
+
+        // Get user's portfolios first
+        const portfoliosResult = await getPortfolios(user.id);
+        let portfolioId = null;
+
+        if (portfoliosResult.success && portfoliosResult.data?.length) {
+          // Use the first portfolio for now
+          portfolioId = portfoliosResult.data[0].id;
+          setCurrentPortfolioId(portfolioId);
+        } else {
+          // Create a default portfolio if user doesn't have any
+          const createResult = await createPortfolio(user.id, 'My Portfolio', 'Default portfolio');
+          if (createResult.success && createResult.data) {
+            portfolioId = createResult.data.id;
+            setCurrentPortfolioId(portfolioId);
+          }
+        }
+
         // Fetch all portfolio data in parallel
-        const [summary, allocation, holdingsData, transactionsData, performanceData] = await Promise.all([
-          getPortfolioSummary(),
-          getAssetAllocation(),
-          getPortfolioHoldings(),
-          getTransactionHistory(),
-          getPortfolioPerformance()
+        const [summary, allocation, holdingsData, transactionsData] = await Promise.all([
+          getPortfolioSummary(user.id),
+          getAssetAllocation(user.id),
+          getPortfolioHoldings(portfolioId, user.id),
+          getTransactionHistory(user.id)
         ]);
+
+        // Get performance data with current portfolio values
+        const performanceData = await getPortfolioPerformance(
+          portfolioId,
+          summary.totalValue,
+          summary.totalCost
+        );
 
         setPortfolioSummary(summary);
         setAssetAllocation(allocation);
@@ -99,25 +167,62 @@ export default function PortfolioPage() {
     };
 
     fetchPortfolioData();
-  }, []);
+  }, [user]);
 
-  // Handle adding a new asset
-  const handleAddAsset = (asset: {
-    id: string;
-    name: string;
-    symbol: string;
-    quantity: number;
-    price: number;
-    date: string;
-  }) => {
-    // In a real app, this would call an API to add the asset
-    console.log('Adding asset:', asset);
+  // Handle portfolio change
+  const handlePortfolioChange = async (portfolioId: string) => {
+    setCurrentPortfolioId(portfolioId);
+    await refreshPortfolioData(portfolioId);
+  };
 
-    // For now, we'll just show a success message
-    alert(`Added ${asset.quantity} ${asset.symbol} to your portfolio!`);
+  // Handle asset added successfully
+  const handleAssetAdded = async () => {
+    await refreshPortfolioData(currentPortfolioId);
+  };
 
-    // Refresh portfolio data
-    // In a real app, you would refetch the data or update the state
+  // Handle holding updated
+  const handleHoldingUpdated = async () => {
+    await refreshPortfolioData(currentPortfolioId);
+  };
+
+  // Handle holding deleted
+  const handleHoldingDeleted = async () => {
+    await refreshPortfolioData(currentPortfolioId);
+  };
+
+  // Handle edit holding
+  const handleEditHolding = (holding: PortfolioHolding) => {
+    setEditingHolding(holding);
+    setShowEditHoldingModal(true);
+  };
+
+  // Refresh portfolio data
+  const refreshPortfolioData = async (portfolioId: string | null) => {
+    try {
+      if (!user) return;
+
+      const [summary, allocation, holdingsData, transactionsData] = await Promise.all([
+        getPortfolioSummary(user.id),
+        getAssetAllocation(user.id),
+        getPortfolioHoldings(portfolioId, user.id),
+        getTransactionHistory(user.id)
+      ]);
+
+      // Get performance data with current portfolio values
+      const performanceData = await getPortfolioPerformance(
+        portfolioId,
+        summary.totalValue,
+        summary.totalCost
+      );
+
+      setPortfolioSummary(summary);
+      setAssetAllocation(allocation);
+      setHoldings(holdingsData);
+      setTransactions(transactionsData);
+      setPerformance(performanceData);
+    } catch (err) {
+      console.error('Error refreshing portfolio data:', err);
+    }
   };
 
   // Format date for transaction history
@@ -153,29 +258,60 @@ export default function PortfolioPage() {
         {/* Portfolio Header */}
         <motion.div
           variants={itemVariants}
-          className="flex flex-col md:flex-row md:items-center md:justify-between gap-6"
+          className="flex flex-col gap-6"
         >
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Portfolio</h1>
-            <p className="text-gray-600 dark:text-gray-400 text-lg">Manage and track your crypto assets</p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Portfolio</h1>
+              <p className="text-gray-600 dark:text-gray-400 text-lg">Manage and track your crypto assets</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <Button
+                variant="outline"
+                size="lg"
+                className="py-2.5 px-5 text-base shadow-sm"
+                onClick={() => setShowImportCSVModal(true)}
+              >
+                <Upload className="w-5 h-5 mr-2" />
+                Import CSV
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="py-2.5 px-5 text-base shadow-sm"
+              >
+                <Download className="w-5 h-5 mr-2" />
+                Export
+              </Button>
+              <Button
+                size="lg"
+                className="py-2.5 px-5 text-base bg-[var(--primary-500)] hover:bg-[var(--primary-600)] text-white shadow-md"
+                onClick={() => setShowAddAssetModal(true)}
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Add Asset
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
-            <Button
-              variant="outline"
-              size="lg"
-              className="py-2.5 px-5 text-base shadow-sm"
-            >
-              <Download className="w-5 h-5 mr-2" />
-              Export
-            </Button>
-            <Button
-              size="lg"
-              className="py-2.5 px-5 text-base bg-[var(--primary-500)] hover:bg-[var(--primary-600)] text-white shadow-md"
-              onClick={() => setShowAddAssetModal(true)}
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Add Asset
-            </Button>
+
+          {/* Portfolio Selector */}
+          <div className="flex items-center justify-between">
+            <PortfolioSelector
+              currentPortfolioId={currentPortfolioId}
+              onPortfolioChange={handlePortfolioChange}
+              onPortfolioCreated={handleAssetAdded}
+            />
+            <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+              <span>{holdings.length} assets</span>
+              <div className="flex items-center space-x-2">
+                <div className={`w-2 h-2 rounded-full ${
+                  connectionStatus === 'connected' ? 'bg-green-500' :
+                  connectionStatus === 'connecting' ? 'bg-yellow-500' : 'bg-red-500'
+                }`} />
+                <span className="capitalize">{connectionStatus}</span>
+              </div>
+              <span>Last updated: {new Date().toLocaleTimeString()}</span>
+            </div>
           </div>
         </motion.div>
 
@@ -352,7 +488,7 @@ export default function PortfolioPage() {
                 </CardHeader>
                 <CardContent className="pt-6">
                   <div className="space-y-4">
-                    {holdings.slice(0, 3).map((holding) => (
+                    {updatedHoldings.slice(0, 3).map((holding) => (
                       <div key={holding.id} className="flex items-center justify-between p-3 rounded-lg border border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
                         <div className="flex items-center">
                           {holding.image && (
@@ -453,10 +589,11 @@ export default function PortfolioPage() {
                       <th className="text-right pb-4 text-sm font-semibold text-gray-500 dark:text-gray-400">Value</th>
                       <th className="text-right pb-4 text-sm font-semibold text-gray-500 dark:text-gray-400">Profit/Loss</th>
                       <th className="text-right pb-4 text-sm font-semibold text-gray-500 dark:text-gray-400">24h</th>
+                      <th className="text-right pb-4 text-sm font-semibold text-gray-500 dark:text-gray-400">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {holdings.map((holding) => (
+                    {updatedHoldings.map((holding) => (
                       <tr key={holding.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
                         <td className="py-5">
                           <div className="flex items-center">
@@ -498,6 +635,16 @@ export default function PortfolioPage() {
                             )}
                             {holding.change24h >= 0 ? '+' : ''}{holding.change24h}%
                           </div>
+                        </td>
+                        <td className="py-5 text-right">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditHolding(holding)}
+                            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                          </Button>
                         </td>
                       </tr>
                     ))}
@@ -597,7 +744,28 @@ export default function PortfolioPage() {
       <AddAssetModal
         isOpen={showAddAssetModal}
         onClose={() => setShowAddAssetModal(false)}
-        onAddAsset={handleAddAsset}
+        portfolioId={currentPortfolioId}
+        onAssetAdded={handleAssetAdded}
+      />
+
+      {/* Edit Holding Modal */}
+      <EditHoldingModal
+        isOpen={showEditHoldingModal}
+        onClose={() => {
+          setShowEditHoldingModal(false);
+          setEditingHolding(null);
+        }}
+        holding={editingHolding}
+        onHoldingUpdated={handleHoldingUpdated}
+        onHoldingDeleted={handleHoldingDeleted}
+      />
+
+      {/* Import CSV Modal */}
+      <ImportCSVModal
+        isOpen={showImportCSVModal}
+        onClose={() => setShowImportCSVModal(false)}
+        portfolioId={currentPortfolioId}
+        onImportComplete={handleAssetAdded}
       />
     </DashboardWrapper>
   );

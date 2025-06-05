@@ -21,7 +21,8 @@ import {
   Settings,
   ChevronDown,
   HelpCircle,
-  LogIn
+  LogIn,
+  TrendingUp
 } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 
@@ -148,6 +149,7 @@ export function Header({ isAuthenticated: propIsAuthenticated }: HeaderProps) {
   const appNavItems = [
     { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
     { href: "/portfolio", label: "Portfolio", icon: <Wallet size={18} /> },
+    { href: "/staking", label: "Staking", icon: <TrendingUp size={18} /> },
     { href: "/market", label: "Market", icon: <BarChart3 size={18} /> },
     { href: "/news", label: "News", icon: <Newspaper size={18} /> },
     { href: "/profile", label: "Profile", icon: <User size={18} /> }

@@ -253,3 +253,161 @@ export async function addTransaction(
     };
   }
 }
+
+/**
+ * Update a portfolio
+ */
+export async function updatePortfolio(
+  portfolioId: string,
+  name?: string,
+  description?: string,
+  isPublic?: boolean
+): Promise<ApiResponse<Portfolio>> {
+  try {
+    const updateData: any = {
+      updated_at: new Date().toISOString(),
+    };
+
+    if (name !== undefined) updateData.name = name;
+    if (description !== undefined) updateData.description = description;
+    if (isPublic !== undefined) updateData.is_public = isPublic;
+
+    const { data, error } = await supabase
+      .from('portfolios')
+      .update(updateData)
+      .eq('id', portfolioId)
+      .select()
+      .single();
+
+    if (error) {
+      return {
+        success: false,
+        error: { message: error.message },
+        data: null,
+      };
+    }
+
+    return {
+      success: true,
+      error: null,
+      data,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: { message: error.message || 'An unknown error occurred' },
+      data: null,
+    };
+  }
+}
+
+/**
+ * Delete a portfolio
+ */
+export async function deletePortfolio(portfolioId: string): Promise<ApiResponse<null>> {
+  try {
+    const { error } = await supabase
+      .from('portfolios')
+      .delete()
+      .eq('id', portfolioId);
+
+    if (error) {
+      return {
+        success: false,
+        error: { message: error.message },
+        data: null,
+      };
+    }
+
+    return {
+      success: true,
+      error: null,
+      data: null,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: { message: error.message || 'An unknown error occurred' },
+      data: null,
+    };
+  }
+}
+
+/**
+ * Update a holding
+ */
+export async function updateHolding(
+  holdingId: string,
+  quantity?: number,
+  purchasePrice?: number,
+  purchaseDate?: string
+): Promise<ApiResponse<Holding>> {
+  try {
+    const updateData: any = {
+      updated_at: new Date().toISOString(),
+    };
+
+    if (quantity !== undefined) updateData.quantity = quantity;
+    if (purchasePrice !== undefined) updateData.purchase_price = purchasePrice;
+    if (purchaseDate !== undefined) updateData.purchase_date = purchaseDate;
+
+    const { data, error } = await supabase
+      .from('holdings')
+      .update(updateData)
+      .eq('id', holdingId)
+      .select()
+      .single();
+
+    if (error) {
+      return {
+        success: false,
+        error: { message: error.message },
+        data: null,
+      };
+    }
+
+    return {
+      success: true,
+      error: null,
+      data,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: { message: error.message || 'An unknown error occurred' },
+      data: null,
+    };
+  }
+}
+
+/**
+ * Delete a holding
+ */
+export async function deleteHolding(holdingId: string): Promise<ApiResponse<null>> {
+  try {
+    const { error } = await supabase
+      .from('holdings')
+      .delete()
+      .eq('id', holdingId);
+
+    if (error) {
+      return {
+        success: false,
+        error: { message: error.message },
+        data: null,
+      };
+    }
+
+    return {
+      success: true,
+      error: null,
+      data: null,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: { message: error.message || 'An unknown error occurred' },
+      data: null,
+    };
+  }
+}
